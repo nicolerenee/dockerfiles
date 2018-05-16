@@ -1,0 +1,13 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build',
+         '--build-arg',
+         'RADARR_VERSION\=${_RADARR_VERSION}',
+         '-t',
+         'gcr.io/$PROJECT_ID/radarr:${_RADARR_VERSION}',
+         '.']
+substitutions:
+    _RADARR_VERSION: 0.2.0.1067
+images: [
+    'gcr.io/$PROJECT_ID/radarr:${_RADARR_VERSION}',
+]
