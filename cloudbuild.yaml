@@ -6,6 +6,7 @@ steps:
          '-t',
          'gcr.io/$PROJECT_ID/radarr:${_RADARR_VERSION}',
          '.']
+  dir: 'radarr'
 substitutions:
     _RADARR_VERSION: 0.2.0.1067
 images: [
