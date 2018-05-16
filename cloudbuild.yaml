@@ -1,6 +1,27 @@
 steps:
 
-  # Radarr:
+  # nzbget:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build',
+           '-t', 'gcr.io/$PROJECT_ID/nzbget',
+           '-t', 'gcr.io/$PROJECT_ID/nzbget:$_NZBGET_VERSION',
+           '.']
+    dir: 'nzbget'
+    waitFor: ['-']
+
+
+  # sonarr:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build',
+           '--build-arg', 'SONARR_VERSION=$_SONARR_VERSION',
+           '-t', 'gcr.io/$PROJECT_ID/sonarr',
+           '-t', 'gcr.io/$PROJECT_ID/sonarr:$_SONARR_VERSION',
+           '.']
+    dir: 'sonarr'
+    waitFor: ['-']
+
+
+  # radarr:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build',
            '--build-arg', 'RADARR_VERSION=$_RADARR_VERSION',
@@ -12,8 +33,14 @@ steps:
 
 
 substitutions:
-    _RADARR_VERSION: 0.2.0.1067
+  _NZBGET_VERSION: 20.0-testing-r2181
+  _SONARR_VERSION: 2.0.0.5163
+  _RADARR_VERSION: 0.2.0.1067
 
 images:
+  - 'gcr.io/$PROJECT_ID/nzbget'
+  - 'gcr.io/$PROJECT_ID/nzbget:$_NZBGET_VERSION'
+  - 'gcr.io/$PROJECT_ID/sonarr'
+  - 'gcr.io/$PROJECT_ID/sonarr:$_SONARR_VERSION'
   - 'gcr.io/$PROJECT_ID/radarr'
   - 'gcr.io/$PROJECT_ID/radarr:$_RADARR_VERSION'
