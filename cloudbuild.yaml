@@ -1,14 +1,17 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
+  args: ['pull', 'gcr.io/$PROJECT_ID/radarr:$BRANCH_NAME']
+- name: 'gcr.io/cloud-builders/docker'
   args: ['build',
-         '--build-arg',
-         'RADARR_VERSION=${_RADARR_VERSION}',
-         '-t',
-         'gcr.io/$PROJECT_ID/radarr:${_RADARR_VERSION}',
+         '--build-arg', 'RADARR_VERSION=$_RADARR_VERSION',
+         '--cache-from', 'gcr.io/$PROJECT_ID/radarr:$BRANCH_NAME',
+         '-t', 'gcr.io/$PROJECT_ID/radarr:$BRANCH_NAME',
+         '-t', 'gcr.io/$PROJECT_ID/radarr:$_RADARR_VERSION',
          '.']
   dir: 'radarr'
+- name: 'gcr.io/cloud-builders/docker'
 substitutions:
     _RADARR_VERSION: 0.2.0.1067
-images: [
-    'gcr.io/$PROJECT_ID/radarr:${_RADARR_VERSION}',
-]
+images:
+  - 'gcr.io/$PROJECT_ID/radarr:$BRANCH_NAME'
+  - 'gcr.io/$PROJECT_ID/radarr:$_RADARR_VERSION'
