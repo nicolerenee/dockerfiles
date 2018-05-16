@@ -2,7 +2,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build',
          '--build-arg',
-         'RADARR_VERSION\=${_RADARR_VERSION}',
+         'RADARR_VERSION=${_RADARR_VERSION}',
          '-t',
          'gcr.io/$PROJECT_ID/radarr:${_RADARR_VERSION}',
          '.']
