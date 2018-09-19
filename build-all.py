@@ -10,8 +10,8 @@ import yaml
 
 REPO_URL="quay.io/nicolerenee"
 
-for filename in glob.iglob('./**/_metadata.yaml', recursive=True):
-    dir = filename.replace('/_metadata.yaml', '')
+for filename in glob.iglob('./**/build.yaml', recursive=True):
+    dir = filename.replace('/build.yaml', '')
 
     dockerfile = Path(dir+'/Dockerfile')
     if not dockerfile.is_file():
@@ -26,7 +26,10 @@ for filename in glob.iglob('./**/_metadata.yaml', recursive=True):
     for k in metadata['version_info'].keys():
         buildargs = "%s --build-arg %s=\"%s\"" % (buildargs, k, metadata['version_info'][k])
 
-    cmd = "docker build --no-cache --rm --force-rm %s -t %s %s" % (buildargs, image, dir)
+    cmd = "docker build --pull --rm --force-rm %s -t %s %s" % (buildargs, image, dir)
+    print("DEBUG:::::")
+    print("DEBUG::::: %s" % (cmd))
+    print("DEBUG:::::")
     subprocess.run(cmd, shell=True, check=True)
 
     cmd = "docker push %s" % image

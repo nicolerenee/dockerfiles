@@ -1,0 +1,7 @@
+github:
+  repo: nzbget/nzbget
+name: nzbget
+version_info:
+  release_name: '20.0'
+  version: v20.0
+  version_numeric: '20.0'

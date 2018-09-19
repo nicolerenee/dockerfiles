@@ -1,5 +1,0 @@
-name: sonarr
-github:
-  repo: 'Sonarr/Sonarr'
-  tags:
-    regex: '^v[0-9].*'

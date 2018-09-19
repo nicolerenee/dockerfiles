@@ -39,9 +39,9 @@ def get_branch():
     return g.get_repo(r).get_branch(branch).commit
 
 # load projects
-for filename in glob.iglob('./**/metadata.yaml', recursive=True):
-    with open(filename, 'r') as stream:
-        metadata = yaml.load(stream)
+for filename in glob.iglob('./**/build.yaml', recursive=True):
+    with open(filename, 'r') as configFile:
+        metadata = yaml.load(configFile)
 
     project = metadata['name']
 
@@ -74,5 +74,5 @@ for filename in glob.iglob('./**/metadata.yaml', recursive=True):
         args['version_numeric'] = re.sub(r"(?i)^v", "",  version) # Strip leading v
         metadata['version_info'] = args
 
-        with io.open(filename.replace('metadata', '_metadata'), 'w', encoding='utf8') as outfile:
-            yaml.dump(metadata, outfile, default_flow_style=False, allow_unicode=True)
+    with open(filename, 'w') as configFile:
+        yaml.dump(metadata, configFile, default_flow_style=False, allow_unicode=True)
