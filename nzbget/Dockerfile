@@ -1,23 +1,32 @@
-FROM alpine:latest
+FROM python:2-alpine
 LABEL maintainer "Nicole Renée Hubbard <nicole@nicolerenee.io>"
 
-RUN apk add --no-cache \
-    curl \
-    p7zip \
-    python2 \
-    unrar \
-    wget
+ARG release_name
+ARG version
+ARG version_numeric
 
-ARG NZBGET_VERSION="20.0-r2181"
-ARG NZBGET_BINARY_VERSION="20.0-testing-r2181"
-RUN curl -L -o /tmp/nzbget.run \
-      https://github.com/nzbget/nzbget/releases/download/v${NZBGET_VERSION}/nzbget-${NZBGET_BINARY_VERSION}-bin-linux.run \
- && mkdir /app /config \
- && sh /tmp/nzbget.run --destdir /app \
- && cp /app/nzbget.conf /config/nzbget.conf \
+ENV LANG "en_US.UTF-8"
+ENV LANGUAGE "en_US.UTF-8"
+ENV TERM "xterm"
+
+RUN apk add --no-cache \
+    bash \
+    ca-certificates \
+    p7zip \
+    unrar \
+    --repository https://dl-4.alpinelinux.org/alpine/edge/testing
+
+RUN wget https://github.com/nzbget/nzbget/releases/download/${version}/nzbget-${release_name}-bin-linux.run -O /tmp/nzbget.run \
+ && bash /tmp/nzbget.run --destdir /opt/nzbget \
+ && mkdir /config \
+ && cp /opt/nzbget/nzbget.conf /config/nzbget.conf \
  && rm -rf /tmp/*
 
-EXPOSE 6789
+RUN addgroup -g 1000 -S nzbget \
+  && adduser -u 1000 -SHG nzbget nzbget \
+  && chown -R nzbget:nzbget /config /opt/nzbget
 
-ENTRYPOINT [ "/app/nzbget" ]
-CMD [ "-s", "-o", "OutputMode=log", "-c", "/config/nzbget.conf" ]
+USER nzbget
+
+ENTRYPOINT [ "/opt/nzbget/nzbget" ]
+CMD [ "-s", "-o", "OutputMode=loggable", "-c", "/config/nzbget.conf" ]

@@ -1,27 +1,32 @@
-FROM mono:5.0
+FROM mono:5
 LABEL maintainer "Nicole Renée Hubbard <nicole@nicolerenee.io>"
 
-ARG UID=1000
-ARG GID=1000
-RUN groupadd -g ${GID} app && useradd -u ${UID} -g ${GID} app \
-&& apt-get update \
-&& apt-get install -y mediainfo \
-&& apt-get clean
+ARG release_name
+ARG version
+ARG version_numeric
 
-ARG TINI_VERSION=v0.16.1
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
+ENV LANG "en_US.UTF-8"
+ENV LANGUAGE "en_US.UTF-8"
+ENV TERM "xterm"
 
-RUN chmod +x /tini \
-&& mkdir /sonarr \
-&& mkdir /config \
-&& chown app:app /config
+RUN apt-get update \
+ && apt-get install -y mediainfo\
+ && apt-get clean
 
-ARG SONARR_VERSION=2.0.0.5163
-RUN sh -c "curl http://download.sonarr.tv/v2/master/mono/NzbDrone.master.${SONARR_VERSION}.mono.tar.gz | tar zx  -C /sonarr --strip-components 1"
+RUN groupadd -g 1000 sonarr && useradd -u 1000 -g 1000 sonarr \
+ && mkdir -p /opt/sonarr /config \
+ && curl -Lo /tmp/sonarr.tar.gz "http://download.sonarr.tv/v2/master/mono/NzbDrone.master.${version_numeric}.mono.tar.gz" \
+ && tar -xzvf /tmp/sonarr.tar.gz -C /opt/sonarr --strip-components 1 \
+ && rm -rf /tmp/sonarr.tar.gz
 
-USER app
-VOLUME /config
-EXPOSE 8989
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-ENTRYPOINT ["/tini", "--"]
-CMD ["mono", "/sonarr/NzbDrone.exe", "--no-browser", "-data=/config"]
+# Change ownership and make sure everyone can access files
+RUN chown -R sonarr:sonarr /opt/sonarr /config \
+ && find /opt/sonarr -type f -print0 | xargs -0 chmod 0644
+
+WORKDIR /opt/sonarr
+
+USER sonarr
+
+ENTRYPOINT ["entrypoint.sh"]

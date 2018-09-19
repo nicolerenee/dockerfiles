@@ -1,0 +1,5 @@
+name: radarr
+github:
+  repo: 'Radarr/Radarr'
+  releases:
+    prereleases: true

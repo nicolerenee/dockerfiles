@@ -1,0 +1,38 @@
+FROM alpine:latest
+LABEL maintainer "Nicole Renée Hubbard <nicole@nicolerenee.io>"
+
+ARG release_name
+ARG version
+ARG version_numeric
+
+ENV LANG "en_US.UTF-8"
+ENV LANGUAGE "en_US.UTF-8"
+ENV TERM "xterm"
+
+RUN apk add --no-cache \
+    bash \
+    ca-certificates \
+    libmediainfo \
+    mono \
+    tar \
+    --repository https://dl-4.alpinelinux.org/alpine/edge/testing
+
+RUN mkdir -p /opt/sonarr \
+ && wget "http://download.sonarr.tv/v2/master/mono/NzbDrone.master.${version_numeric}.mono.tar.gz" -O /tmp/sonarr.tar.gz \
+ && tar -xzvf /tmp/sonarr.tar.gz -C /opt/sonarr --strip-components 1 \
+ && rm -rf /tmp/sonarr.tar.gz
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Create user and change ownership
+RUN addgroup -g 1024 -S sonarr \
+ && adduser -u 1024 -SHG sonarr sonarr \
+ && mkdir -p /config \
+ && chown -R sonarr:sonarr /opt/sonarr /config \
+ && find /opt/sonarr -type f -print0 | xargs -0 chmod 0644
+
+WORKDIR /opt/sonarr
+
+USER sonarr
+
+ENTRYPOINT ["entrypoint.sh"]

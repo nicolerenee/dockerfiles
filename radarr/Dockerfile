@@ -1,29 +1,32 @@
-FROM mono:5.0
+FROM mono:5
 LABEL maintainer "Nicole Renée Hubbard <nicole@nicolerenee.io>"
 
-ARG UID=1000
-ARG GID=1000
-RUN groupadd -g ${GID} app && useradd -u ${UID} -g ${GID} app \
-&& apt-get update \
-&& apt-get install -y mediainfo \
-&& apt-get clean
+ARG release_name
+ARG version
+ARG version_numeric
 
-ARG TINI_VERSION=v0.16.1
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
+ENV LANG "en_US.UTF-8"
+ENV LANGUAGE "en_US.UTF-8"
+ENV TERM "xterm"
 
-RUN chmod +x /tini \
-&& mkdir /radarr \
-&& mkdir /config \
-&& chown app:app /config
+RUN apt-get update \
+ && apt-get install -y mediainfo\
+ && apt-get clean
 
-ARG RADARR_VERSION=0.2.0.1067
-RUN sh -c "curl -L https://github.com/Radarr/Radarr/releases/download/v${RADARR_VERSION}/Radarr.develop.${RADARR_VERSION}.linux.tar.gz | tar zx  -C /radarr --strip-components 1"
-RUN find /radarr -type d -exec chmod 0755 {} \; \
- && find /radarr -type f -exec chmod 0644 {} \;
+RUN groupadd -g 1000 radarr && useradd -u 1000 -g 1000 radarr \
+ && mkdir -p /opt/radarr /config \
+ && curl -Lo /tmp/radarr.tar.gz "https://github.com/Radarr/Radarr/releases/download/${version}/Radarr.develop.${version_numeric}.linux.tar.gz" \
+ && tar -xzvf /tmp/radarr.tar.gz -C /opt/radarr --strip-components 1 \
+ && rm -rf /tmp/radarr.tar.gz
 
-USER app
-VOLUME /config
-EXPOSE 7878
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-ENTRYPOINT ["/tini", "--"]
-CMD ["mono", "/radarr/Radarr.exe", "--no-browser", "-data=/config"]
+# Change ownership and make sure everyone can access files
+RUN chown -R radarr:radarr /opt/radarr /config \
+ && find /opt/radarr -type f -print0 | xargs -0 chmod 0644
+
+WORKDIR /opt/radarr
+
+USER radarr
+
+ENTRYPOINT ["entrypoint.sh"]
