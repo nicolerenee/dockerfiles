@@ -1,0 +1,8 @@
+github:
+  branch: master
+  repo: intel/intel-device-plugins-for-kubernetes
+name: intel-k8s-gpu-device-plugin
+version_info:
+  release_name: master
+  version: 64c7e0e85c2eb1c88eb3494097b5440b5e620019
+  version_numeric: 64c7e0e85c2eb1c88eb3494097b5440b5e620019

@@ -4,6 +4,6 @@ github:
     regex: ^v[0-9].*
 name: sonarr
 version_info:
-  release_name: v2.0.0.5228
-  version: v2.0.0.5228
-  version_numeric: 2.0.0.5228
+  release_name: v2.0.0.5322
+  version: v2.0.0.5322
+  version_numeric: 2.0.0.5322

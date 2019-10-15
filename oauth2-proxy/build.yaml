@@ -1,7 +1,0 @@
-github:
-  repo: bitly/oauth2_proxy
-name: oauth2-proxy
-version_info:
-  release_name: V2.2
-  version: v2.2
-  version_numeric: '2.2'

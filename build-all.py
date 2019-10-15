@@ -33,4 +33,4 @@ for filename in glob.iglob('./**/build.yaml', recursive=True):
     subprocess.run(cmd, shell=True, check=True)
 
     cmd = "docker push %s" % image
-    # subprocess.run(cmd, shell=True, check=True)
+    subprocess.run(cmd, shell=True, check=True)
