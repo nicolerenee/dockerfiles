@@ -6,7 +6,7 @@ ENV GITHUB_USER "nicolerenee"
 
 RUN apt-get update \
  && apt-get upgrade -y \
- && apt-get install -y openssh-server \
+ && apt-get install -y openssh-server rsync tmux sudo vim\
  && mkdir /var/run/sshd
 
 RUN sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin no/' /etc/ssh/sshd_config \
